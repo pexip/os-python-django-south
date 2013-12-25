@@ -1,3 +1,9 @@
+python-django-south (0.7.3-1ubuntu1pexip1) pexip; urgency=low
+
+  * Prepare Pexip packaging
+
+ -- John-Mark Bell <jmb@pexip.com>  Wed, 25 Dec 2013 03:00:40 +0000
+
 python-django-south (0.7.3-1ubuntu1) precise; urgency=low
 
   * debian/{control,rules}: Transition to dh python2.
