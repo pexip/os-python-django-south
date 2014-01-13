@@ -1,3 +1,9 @@
+python-django-south (0.8.4-1pexip1) pexip; urgency=low
+
+  * Imported Upstream version 0.8.4
+
+ -- Colin Bradbury <colin@pexip.com>  Mon, 13 Jan 2014 17:43:44 +0000
+
 python-django-south (0.7.3-1ubuntu1pexip1) pexip; urgency=low
 
   * Prepare Pexip packaging
