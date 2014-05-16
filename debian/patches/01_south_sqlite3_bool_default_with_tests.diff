@@ -1,0 +1,60 @@
+diff --git a/south/db/sqlite3.py b/south/db/sqlite3.py
+index c4014d3..8a5e7b6 100644
+--- a/south/db/sqlite3.py
++++ b/south/db/sqlite3.py
+@@ -31,7 +31,9 @@ class DatabaseOperations(generic.DatabaseOperations):
+         field_default = None
+         if not getattr(field, '_suppress_default', False):
+             default = field.get_default()
+-            if default is not None:
++            if isinstance(default, bool):
++                field_default = int(default)
++            elif default is not None:
+                 field_default = "'%s'" % field.get_db_prep_save(default, connection=self._get_connection())
+         field._suppress_default = True
+         self._remake_table(table_name, added={
+diff --git a/south/tests/db.py b/south/tests/db.py
+index e63c563..8a28452 100644
+--- a/south/tests/db.py
++++ b/south/tests/db.py
+@@ -330,6 +330,40 @@ class TestOperations(unittest.TestCase):
+         self.assertIsNone(null2, "Null boolean field (added with default) with no value inserted returns non-null")
+         self.assertEquals(false, False)
+         db.delete_table("test_addnbc")
++
++    def test_add_bool_default_true(self):
++        """
++        Test adding BooleanField(default=True) column sets default for existing rows
++        """
++        db.create_table("test_addbdt", [
++            ('id', models.IntegerField()),
++        ])
++
++        # insert some data so we can test the default values of the added column
++        db.execute("INSERT INTO test_addbdt (id) VALUES (1)")
++        # Add a bool column defaulting to False
++        db.add_column('test_addbdt', 'flag', models.BooleanField(default=True))
++        # Verify that the default was applied to the existing row
++        flag = db.execute("SELECT flag FROM test_addbdt WHERE id=1")[0][0]
++        self.assertIs(flag, True)
++        db.delete_table("test_addbdt")
++
++    def test_add_bool_default_false(self):
++        """
++        Test adding BooleanField(default=False) column sets default for existing rows
++        """
++        db.create_table("test_addbdf", [
++            ('id', models.IntegerField()),
++        ])
++
++        # insert some data so we can test the default values of the added column
++        db.execute("INSERT INTO test_addbdf (id) VALUES (1)")
++        # Add a bool column defaulting to False
++        db.add_column('test_addbdf', 'flag', models.BooleanField(default=False))
++        # Verify that the default was applied to the existing row
++        flag = db.execute("SELECT flag FROM test_addbdf WHERE id=1")[0][0]
++        self.assertIs(flag, False)
++        db.delete_table("test_addbdf")
+     
+     def test_alter_columns(self):
+         """
